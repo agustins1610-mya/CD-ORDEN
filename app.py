@@ -54,10 +54,7 @@ def fecha_es(d):
     return f"{d.day} de {MESES_ES[d.month-1]} de {d.year}"
 
 # ── Google Sheets ─────────────────────────────────────────────────────────────
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive.readonly",
-]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 SHEET_NAME = "expedientes_fro"   # nombre de la planilla en Drive
 WORKSHEET   = "expedientes"       # nombre de la pestaña
 
@@ -343,7 +340,7 @@ with tab2:
                 if not any(i["id"] == row["id"] for i in st.session_state.com_items):
                     st.session_state.com_items.append({
                         "id": row["id"], "numero": row["numero"],
-                        "descripcion": row["descripcion"], "obs": ""
+                        "descripcion": row["descripcion"], "comision_trat": row.get("comision", "")
                     })
         else:
             st.caption("Sin resultados.")
@@ -362,11 +359,19 @@ with tab2:
                     st.markdown(f"**{idx+1}.**")
                 with c2:
                     st.markdown(f"**Expte. N° {item['numero']}**")
-                    st.caption(item["descripcion"][:200])
-                    item["obs"] = st.text_input(
-                        "Observaciones", value=item["obs"],
-                        placeholder="Ej: DOCENCIA (opcional)",
-                        key=f"obs_com_{idx}", label_visibility="collapsed"
+                    item["descripcion"] = st.text_area(
+                        "Descripción", value=item["descripcion"],
+                        key=f"desc_com_{idx}", label_visibility="collapsed",
+                        height=80
+                    )
+                    com_options = [""] + COMISIONES_ALL
+                    current_com = item.get("comision_trat", "")
+                    com_idx = com_options.index(current_com) if current_com in com_options else 0
+                    item["comision_trat"] = st.selectbox(
+                        "Comisión de tratamiento", options=com_options,
+                        index=com_idx, key=f"comtrat_{idx}",
+                        format_func=lambda x: x if x else "Seleccionar comisión...",
+                        label_visibility="collapsed"
                     )
                 with c3:
                     col_u, col_d = st.columns(2)
@@ -400,8 +405,8 @@ with tab2:
         texto += f"Comisiones de {comisiones_txt}:\n\n"
         for i, item in enumerate(st.session_state.com_items):
             texto += f"{i+1}. Expte. N° {item['numero']}. {item['descripcion']}"
-            if item["obs"]:
-                texto += f" - {item['obs']}"
+            if item.get("comision_trat"):
+                texto += f" - {item['comision_trat']}"
             texto += "\n\n"
         texto += "Los saludo atentamente.-"
 
