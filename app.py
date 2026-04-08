@@ -54,7 +54,10 @@ def fecha_es(d):
     return f"{d.day} de {MESES_ES[d.month-1]} de {d.year}"
 
 # ── Google Sheets ─────────────────────────────────────────────────────────────
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive.readonly",
+]
 SHEET_NAME = "expedientes_fro"   # nombre de la planilla en Drive
 WORKSHEET   = "expedientes"       # nombre de la pestaña
 
