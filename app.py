@@ -60,7 +60,17 @@ WORKSHEET   = "expedientes"       # nombre de la pestaña
 
 @st.cache_resource
 def get_gs_client():
-    creds_dict = st.secrets["gcp_service_account"]
+    creds_dict = dict(st.secrets["gcp_service_account"])
+    # Arregla la private_key sin importar cómo fue pegada en los secrets
+    pk = creds_dict.get("private_key", "")
+    pk = pk.replace("\\n", "\n")          # \n literal → salto real
+    pk = pk.replace("\r\n", "\n")         # Windows line endings
+    pk = pk.replace("\r", "\n")
+    # Elimina caracteres no-ASCII que se cuelan al copiar/pegar
+    pk = pk.encode("ascii", errors="ignore").decode("ascii")
+    if not pk.strip().endswith("-----"):
+        pk = pk.strip() + "\n"
+    creds_dict["private_key"] = pk
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     return gspread.authorize(creds)
 
