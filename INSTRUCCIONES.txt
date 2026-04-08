@@ -1,0 +1,96 @@
+# INSTRUCCIONES DE INSTALACIÓN
+# Consejo Directivo FRO / UNSa — App en línea con Streamlit
+
+## ARCHIVOS QUE RECIBÍS
+
+- app.py             → la aplicación principal
+- seed_data.json     → los 400 expedientes de tu base
+- requirements.txt   → dependencias
+- secrets_template.toml → plantilla de credenciales
+
+---
+
+## PASO 1 — Crear cuenta en GitHub (si no tenés)
+1. Ir a https://github.com → Sign up
+2. Crear un repositorio nuevo, nombre: "consejo-directivo-fro"
+3. Subir los 4 archivos (app.py, seed_data.json, requirements.txt)
+
+---
+
+## PASO 2 — Crear la planilla en Google Sheets
+
+1. Abrí https://sheets.google.com
+2. Creá una planilla nueva → nombre exacto: "expedientes_fro"
+3. En la primera pestaña, renombrala: "expedientes"
+4. En la fila 1 escribí estos encabezados (exactamente así):
+   id | numero | descripcion | iniciador | comision | fecha1 | fecha2 | fecha3
+5. Importá los datos:
+   Archivo → Importar → Subir → elegí seed_data.json
+   (Elegí "reemplazar hoja actual", separador "detectar automáticamente")
+
+---
+
+## PASO 3 — Crear cuenta de servicio de Google (gratis)
+
+1. Ir a https://console.cloud.google.com
+2. Crear proyecto nuevo (o usar uno existente)
+3. En el buscador: "Google Sheets API" → Habilitar
+4. En el buscador: "Google Drive API" → Habilitar
+5. Ir a "Credenciales" → Crear credencial → Cuenta de servicio
+   - Nombre: consejo-directivo
+   - Rol: Editor
+6. Click en la cuenta creada → pestaña "Claves" → Agregar clave → JSON
+7. Se descarga un archivo .json → GUARDALO, lo necesitás ahora
+
+---
+
+## PASO 4 — Compartir la planilla con la cuenta de servicio
+
+1. Abrir el archivo JSON descargado, copiá el valor de "client_email"
+   Ejemplo: consejo-directivo@mi-proyecto.iam.gserviceaccount.com
+2. Abrí tu planilla "expedientes_fro" en Google Sheets
+3. Botón "Compartir" → pegar ese email → rol Editor → Enviar
+
+---
+
+## PASO 5 — Subir a Streamlit Cloud
+
+1. Ir a https://share.streamlit.io → conectar con GitHub
+2. New app → elegir tu repositorio → archivo: app.py → Deploy
+3. Una vez que esté desplegando, ir a:
+   Settings → Secrets → pegar esto (con los valores del archivo JSON):
+
+[gcp_service_account]
+type = "service_account"
+project_id = "TU_PROJECT_ID"
+private_key_id = "TU_PRIVATE_KEY_ID"
+private_key = "-----BEGIN RSA PRIVATE KEY-----\nLAARGA CLAVE\n-----END RSA PRIVATE KEY-----\n"
+client_email = "tu-cuenta@tu-proyecto.iam.gserviceaccount.com"
+client_id = "123456789"
+auth_uri = "https://accounts.google.com/o/oauth2/auth"
+token_uri = "https://oauth2.googleapis.com/token"
+auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+client_x509_cert_url = "https://www.googleapis.com/robot/v1/metadata/x509/tu-cuenta..."
+
+4. Guardar → Reboot app
+5. ¡Listo! Tenés una URL del tipo https://tu-app.streamlit.app
+
+---
+
+## NOTAS IMPORTANTES
+
+- La URL que genera Streamlit es pública. Si querés protegerla con contraseña,
+  podés activar la opción "Viewer authentication" en los settings de la app
+  en Streamlit Cloud (requiere cuenta de GitHub con email verificado).
+
+- Los datos se guardan en Google Sheets en tiempo real. Cualquier cambio
+  hecho desde una computadora lo ven las demás al instante.
+
+- Si algo falla, la app carga los datos del archivo seed_data.json local
+  como respaldo automático.
+
+---
+
+## ¿DUDAS?
+
+Consultale a Claude con la pregunta específica que tengas.
